@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Placement Management System</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Campus placements</p>
+        <h1>Placement Management System</h1>
+      </div>
+      <div class="session">
+        <span id="userBadge" class="badge hidden"></span>
+        <button id="logoutBtn" class="ghost hidden">Logout</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="authView" class="auth-grid">
+        <div class="intro-panel">
+          <p class="eyebrow">FastAPI + MySQL</p>
+          <h2>Track companies, jobs, student profiles, and application outcomes in one workflow.</h2>
+          <p>
+            Built for placement cells and students, with JWT login, role-based access,
+            SQLAlchemy models, Alembic migrations, and a clean JavaScript frontend.
+          </p>
+          <div class="metric-row">
+            <span>Student portal</span>
+            <span>Admin dashboard</span>
+            <span>Status tracking</span>
+          </div>
+        </div>
+
+        <div class="auth-panel">
+          <div class="tabs">
+            <button class="tab active" data-auth-tab="login">Login</button>
+            <button class="tab" data-auth-tab="register">Register</button>
+          </div>
+
+          <form id="loginForm" class="form-stack">
+            <label>
+              Email
+              <input name="email" type="email" required placeholder="admin@college.edu" />
+            </label>
+            <label>
+              Password
+              <input name="password" type="password" required placeholder="Enter password" />
+            </label>
+            <button type="submit" class="primary">Login</button>
+          </form>
+
+          <form id="registerForm" class="form-stack hidden">
+            <label>
+              Full name
+              <input name="full_name" type="text" required placeholder="Ananya Sharma" />
+            </label>
+            <label>
+              Email
+              <input name="email" type="email" required placeholder="student@college.edu" />
+            </label>
+            <label>
+              Password
+              <input name="password" type="password" required minlength="6" placeholder="Minimum 6 characters" />
+            </label>
+            <button type="submit" class="primary">Create account</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="appView" class="hidden">
+        <nav class="module-nav">
+          <button class="module-tab active" data-view="overview">Overview</button>
+          <button class="module-tab" data-view="jobs">Jobs</button>
+          <button class="module-tab" data-view="applications">Applications</button>
+          <button class="module-tab student-only" data-view="profile">Profile</button>
+          <button class="module-tab admin-only" data-view="admin">Admin</button>
+        </nav>
+
+        <section id="overviewPanel" class="view-panel">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">Dashboard</p>
+              <h2 id="dashboardTitle">Overview</h2>
+            </div>
+            <button id="refreshBtn" class="ghost">Refresh</button>
+          </div>
+          <div id="statsGrid" class="stats-grid"></div>
+          <div id="overviewList" class="data-grid"></div>
+        </section>
+
+        <section id="jobsPanel" class="view-panel hidden">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">Open roles</p>
+              <h2>Jobs</h2>
+            </div>
+            <div class="filters">
+              <input id="jobSearch" type="search" placeholder="Search title" />
+              <input id="branchFilter" type="text" placeholder="Branch" />
+            </div>
+          </div>
+          <div id="jobsList" class="data-grid"></div>
+        </section>
+
+        <section id="applicationsPanel" class="view-panel hidden">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">Pipeline</p>
+              <h2>Applications</h2>
+            </div>
+          </div>
+          <div id="applicationsList" class="data-grid"></div>
+        </section>
+
+        <section id="profilePanel" class="view-panel hidden">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">Student details</p>
+              <h2>My Profile</h2>
+            </div>
+          </div>
+          <form id="profileForm" class="form-grid">
+            <label>
+              Roll number
+              <input name="roll_number" type="text" required />
+            </label>
+            <label>
+              Branch
+              <input name="branch" type="text" required placeholder="CSE" />
+            </label>
+            <label>
+              Graduation year
+              <input name="graduation_year" type="number" required value="2027" />
+            </label>
+            <label>
+              CGPA
+              <input name="cgpa" type="number" required min="0" max="10" step="0.01" />
+            </label>
+            <label>
+              Phone
+              <input name="phone" type="tel" />
+            </label>
+            <label>
+              Resume URL
+              <input name="resume_url" type="url" placeholder="https://..." />
+            </label>
+            <label class="span-2">
+              Skills
+              <textarea name="skills" rows="3" placeholder="Python, FastAPI, SQL, JavaScript"></textarea>
+            </label>
+            <button type="submit" class="primary">Save profile</button>
+          </form>
+        </section>
+
+        <section id="adminPanel" class="view-panel hidden">
+          <div class="admin-layout">
+            <form id="companyForm" class="form-stack admin-card">
+              <h3>Add company</h3>
+              <label>
+                Name
+                <input name="name" type="text" required />
+              </label>
+              <label>
+                Website
+                <input name="website" type="url" />
+              </label>
+              <label>
+                Industry
+                <input name="industry" type="text" />
+              </label>
+              <label>
+                Location
+                <input name="location" type="text" />
+              </label>
+              <label>
+                Description
+                <textarea name="description" rows="3"></textarea>
+              </label>
+              <button type="submit" class="primary">Add company</button>
+            </form>
+
+            <form id="jobForm" class="form-stack admin-card">
+              <h3>Post job</h3>
+              <label>
+                Company
+                <select name="company_id" id="companySelect" required></select>
+              </label>
+              <label>
+                Title
+                <input name="title" type="text" required />
+              </label>
+              <label>
+                Job type
+                <input name="job_type" type="text" value="Full Time" />
+              </label>
+              <label>
+                Location
+                <input name="location" type="text" required />
+              </label>
+              <label>
+                Minimum CGPA
+                <input name="min_cgpa" type="number" min="0" max="10" step="0.01" value="6.5" />
+              </label>
+              <label>
+                Package LPA
+                <input name="package_lpa" type="number" min="0" step="0.1" />
+              </label>
+              <label>
+                Eligible branches
+                <input name="eligible_branches" type="text" placeholder="CSE, IT, ECE" />
+              </label>
+              <label>
+                Required skills
+                <input name="required_skills" type="text" placeholder="Python, SQL, APIs" />
+              </label>
+              <label>
+                Deadline
+                <input name="deadline" type="datetime-local" />
+              </label>
+              <label>
+                Description
+                <textarea name="description" rows="3" required></textarea>
+              </label>
+              <button type="submit" class="primary">Publish job</button>
+            </form>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <div id="toast" class="toast hidden"></div>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
